@@ -19,6 +19,7 @@ def check_input(user_input, word_list, input_char_list):
             char_idx = [i for i in range(len(word_list)) if word_list[i] == user_input]
             for idx in char_idx:
                 input_char_list[idx] = user_input
+            return True
     else:
         print(f"{user_input} is not in the word")
         return False
@@ -36,7 +37,7 @@ def start_game(word):
 
 def main():
     repeatGame = start_game(random.choice(words).lower())
-    while repeatGame == "y":
+    while repeatGame.lower() == "y":
         repeatGame = start_game(random.choice(words).lower())
 
 
