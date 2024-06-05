@@ -23,17 +23,22 @@ def check_input(user_input, word_list, input_char_list):
         print(f"{user_input} is not in the word")
         return False
 
-def main():
-    word = random.choice(words)
-    word = word.lower()
+def start_game(word):
     word_list = list(word)
+    input_char_list = ["*" for i in range(len(word_list))]
     misses = 0
-    input_char_list = [ "*" for i in range(len(word_list)) ]
     while input_char_list != word_list:
         user_input=get_input_from_user(input_char_list)
         if not check_input(user_input, word_list, input_char_list):
             misses += 1
     print(f"The word is {word}. You missed {misses} time")
+    return input("Do you want to guess another word? Enter y or n> ")
+
+def main():
+    repeatGame = start_game(random.choice(words).lower())
+    while repeatGame == "y":
+        repeatGame = start_game(random.choice(words).lower())
+
 
 
 
