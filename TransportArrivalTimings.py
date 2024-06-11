@@ -2,6 +2,7 @@ import urllib.request
 from pprint import pprint
 import ssl
 import json
+import time
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -17,31 +18,33 @@ stop_points = urllib.request.urlopen('https://api.tfl.gov.uk/Stoppoint?lat=51.52
 stop_points_data = stop_points.read().decode()
 stop_points_dict = json.loads(stop_points_data)
 
-pprint(stop_points_dict['stopPoints'])
+#pprint(stop_points_dict['stopPoints'])
 
 stop_point_dict = {}
-arrivals_dict = []
+arrivals_dict = {}
 for stop in stop_points_dict['stopPoints']:
 #    print(f"Stop: {stop['commonName']}, Type: {stop['stopType']}, Distance: {stop['distance']} meters, id is {stop['id']}")
     stop_point_dict[stop['id']] = { stop['stopType']: stop['commonName'] }
-pprint(stop_point_dict)
+#pprint(stop_point_dict)
 #"""
 for id, cn in stop_point_dict.items():
-    if "NaptanMetroStation" not in cn.keys():
-        stop_point = urllib.request.urlopen(f"https://api.tfl.gov.uk/Stoppoint/{id}")
-        stop_point_data = stop_point.read().decode()
-        stop_point_dict = json.loads(stop_point_data)
-        print(f"Stop: {cn}, Type: {stop_point_dict['stopType']}, StopID: {stop_point_dict['id']}")
+    stop_point = urllib.request.urlopen(f"https://api.tfl.gov.uk/Stoppoint/{id}")
+    stop_point_data = stop_point.read().decode()
+    stop_point_dict = json.loads(stop_point_data)
+    time.sleep(10)
+    print(f"Stop: {cn.values()}, Type: {stop_point_dict['stopType']}, StopID: {id}")
     #print(f"Stop: {stop['commonName']}, Type: {stop['stopType']}")
-        arrivals = urllib.request.urlopen(f"https://api.tfl.gov.uk/StopPoint/{stop_point_dict['id']}/Arrivals")
-        arrivals_data = arrivals.read().decode()
-        arrivals_dict = json.loads(arrivals_data)
-if arrivals_dict != []:
-    if len(arrivals_dict) > 0:
-        for i in range(0 ,len(arrivals_dict) - 1):
-            if len(arrivals_dict) > 0:
-                print(f"Mode: {arrivals_dict[i]['modeName']},  Line: {arrivals_dict[i]['lineId']}, Destination: {arrivals_dict[i]['destinationName']}, Time to Station: {arrivals_dict[i]['timeToStation']} seconds")
-            else:
-                print(f"Mode: {arrivals_dict[0]['modeName']},  Line: {arrivals_dict[0]['lineId']}, Destination: {arrivals_dict[0]['destinationName']}, Time to Station: {arrivals_dict[0]['timeToStation']} seconds")
+    arrivals = urllib.request.urlopen(f"https://api.tfl.gov.uk/StopPoint/{id}/Arrivals")
+    arrivals_data = arrivals.read().decode()
+    arrivals_dict = json.loads(arrivals_data)
 
+    if arrivals_dict != []:
+        if len(arrivals_dict) > 0:
+            for i in range(0 ,len(arrivals_dict) - 1):
+                if len(arrivals_dict) > 0:
+                    print(f"Mode: {arrivals_dict[i]['modeName']},  Line: {arrivals_dict[i]['lineId']}, Destination: {arrivals_dict[i]['destinationName']}, stationName: {arrivals_dict[i]['stationName']},  Time to Station: {arrivals_dict[i]['timeToStation']/60} Minutes, platformName: {arrivals_dict[i]['platformName']}")
+                else:
+                    print(f"Mode: {arrivals_dict[0]['modeName']},  Line: {arrivals_dict[0]['lineId']}, Destination: {arrivals_dict[0]['destinationName']}, stationName: {arrivals_dict[0]['stationName']}, Time to Station: {arrivals_dict[0]['timeToStation']/60} Minutes")
+    else:
+        print("No arrivals")
 
