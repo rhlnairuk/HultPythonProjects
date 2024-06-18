@@ -32,12 +32,6 @@ plt.xlabel('Month Number')
 plt.ylabel('Sales Units in number')
 plt.title('Sales data')
 plt.legend()
-# Set Y-axis limits to ensure all data is visible
-plt.ylim(bottom=0, top=max(face_cream + face_wash + tooth_paste + moisturizer) + 1000)  # Find max value, add buffer
-
-# Set custom Y-axis ticks
-specific_ticks = range(0, max(face_cream + face_wash + tooth_paste + moisturizer) + 1000, 1000)  # Ticks from 0 to max + 1000 with steps of 1000
-plt.yticks(specific_ticks)
 plt.tight_layout()
 plt.show()
 
