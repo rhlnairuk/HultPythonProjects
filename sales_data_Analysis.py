@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 def main():
     with open("salesdata.csv", "r") as my_file:
         sales_data = list(csv.reader(my_file,delimiter=","))
-    print(sales_data)
     month_number = [int(sales_data[i][0]) for i in range(1,len(sales_data))]
     # Units Sold
     face_cream = [int(sales_data[i][1]) for i in range(1,len(sales_data))]
