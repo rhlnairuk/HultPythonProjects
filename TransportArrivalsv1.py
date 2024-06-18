@@ -3,6 +3,7 @@ import json
 import time
 import pandas as pd
 import ssl
+import matplotlib.pyplot as plt
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -61,13 +62,19 @@ class TransportFetchData:
 class TransportDataLoader:
     def __init__(self):
         self.file_path = 'upcoming_arrivals_multiple_stops.json'
-        #transport_fetcher = TransportFetchData()
-        #transport_fetcher.get_all_arrivals(self.file_path)
+     #   transport_fetcher = TransportFetchData()
+     #   transport_fetcher.get_all_arrivals(self.file_path)
 
     def load_data(self):
         with open(self.file_path, 'r') as file:
             data = json.load(file)
-        return pd.DataFrame.from_dict(data, orient='index')
+        records = []
+        for stop_id, arrivals_list in data.items():
+            for arrival in arrivals_list:
+                if arrival['Arrivals']:
+                    records.append(arrival)
+        return  pd.DataFrame(records)
+        #return pd.DataFrame.from_dict(data, orient='index')
 
 
 # Analyse the data
@@ -75,13 +82,49 @@ class TransportAnalyseData:
     def __init__(self):
         loader = TransportDataLoader()
         self.data = loader.load_data()
-        print(self.data[0])
-        rows, cols = self.data.shape
-        self.data_copy = self.data.copy()
-        stations = [ self.data[0]['940GZZLUCHL']['stationName'] ]
-        times = [ self.data[0]['940GZZLUCHL']['timeToStation'] ]
-        self.time_sorted = sorted(zip(stations, times), key=lambda x: x[1])
-        print(self.time_sorted)
+        data_len = len(self.data)
+        #for i in range(0, data_len - 1):
+            #print(self.data)
+            #print(self.data[i]['stationName'])
+        arrivals_per_stop = self.data.groupby('stationName').size().sort_values(ascending=False)
+        arrivals_per_line = self.data.groupby('Line').size().sort_values(ascending=False)
+        # Plot arrivals per stop
+        plt.figure(figsize=(10, 6))
+        arrivals_per_stop.plot(kind='bar')
+        plt.title('Number of Arrivals per Stop')
+        plt.xlabel('Stop Name')
+        plt.ylabel('Number of Arrivals')
+        plt.xticks(rotation=90)
+        # Plot arrival times distribution
+        plt.figure(figsize=(10, 6))
+        time_to_station_minutes = self.data['timeToStation'] / 60
+        time_to_station_minutes.plot(kind='hist', bins=20, edgecolor='black')
+        plt.title('Distribution of Arrival Times')
+        plt.xlabel('Time to Station (minutes)')
+        plt.ylabel('Frequency')
+
+        # Plot popular lines
+        plt.figure(figsize=(10, 6))
+        arrivals_per_line.plot(kind='bar')
+        plt.title('Number of Arrivals per Line')
+        plt.xlabel('Line')
+        plt.ylabel('Number of Arrivals')
+
+
+        plt.figure(figsize=(10, 6))
+        arrivals_per_line.plot(kind='bar')
+        plt.title('Frequency of Buses per Line')
+        plt.xlabel('Line')
+        plt.ylabel('Number of Buses')
+
+        plt.tight_layout()
+        plt.show()
+#        rows, cols = self.data.shape
+#        self.data_copy = self.data.copy()
+#        stations = [ self.data[0]['940GZZLUCHL']['stationName'] ]
+#        times = [ self.data[0]['940GZZLUCHL']['timeToStation'] ]
+#        self.time_sorted = sorted(zip(stations, times), key=lambda x: x[1])
+#        print(self.time_sorted)
         #stations = self.data_copy['490007391E']['Arrivals'].explode()['stationName'].tolist()
         #times = self.data_copy['490007391E']['Arrivals'].explode()['timeToStation'].tolist()
         #self.time_sorted = sorted(zip(stations, times), key=lambda x: x[1])

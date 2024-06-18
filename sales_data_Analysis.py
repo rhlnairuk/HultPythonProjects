@@ -3,18 +3,17 @@ import matplotlib.pyplot as plt
 
 def main():
     with open("salesdata.csv", "r") as my_file:
-        mylist=list(csv.reader(my_file,delimiter=","))
-
-    month_number = [int(mylist[i][0]) for i in range(1,len(mylist))]
+        sales_data=list(csv.reader(my_file,delimiter=","))
+    month_number = [int(sales_data[i][0]) for i in range(1,len(sales_data))]
 
     # Units Sold
-    face_cream = [int(mylist[i][1]) for i in range(1,len(mylist))]
-    face_wash = [int(mylist[i][2]) for i in range(1,len(mylist))]
-    tooth_paste = [int(mylist[i][3]) for i in range(1,len(mylist))]
-    moisturizer = [int(mylist[i][4]) for i in range(1,len(mylist))]
+    face_cream = [int(sales_data[i][1]) for i in range(1,len(sales_data))]
+    face_wash = [int(sales_data[i][2]) for i in range(1,len(sales_data))]
+    tooth_paste = [int(sales_data[i][3]) for i in range(1,len(sales_data))]
+    moisturizer = [int(sales_data[i][4]) for i in range(1,len(sales_data))]
 
     # Profit
-    total_profit = [mylist[i][6] for i in range(1,len(mylist))]
+    total_profit = [sales_data[i][6] for i in range(1,len(sales_data))]
 
     # Task 1: Read the Total profit for all months and show it using a line plot
     plt.plot(month_number, total_profit, marker='o')
