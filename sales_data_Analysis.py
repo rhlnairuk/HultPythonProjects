@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 with open("salesdata.csv", "r") as my_file:
     mylist=list(csv.reader(my_file,delimiter=","))
 
-month_number = [mylist[i][0] for i in range(1,len(mylist))]
+month_number = [int(mylist[i][0]) for i in range(1,len(mylist))]
 
 # Units Sold
-face_cream = [mylist[i][1] for i in range(1,len(mylist))]
-face_wash = [mylist[i][2] for i in range(1,len(mylist))]
-tooth_paste = [mylist[i][3] for i in range(1,len(mylist))]
-moisturizer = [mylist[i][4] for i in range(1,len(mylist))]
-total_units = [mylist[i][5] for i in range(1,len(mylist))]
-
+face_cream = [int(mylist[i][1]) for i in range(1,len(mylist))]
+face_wash = [int(mylist[i][2]) for i in range(1,len(mylist))]
+tooth_paste = [int(mylist[i][3]) for i in range(1,len(mylist))]
+moisturizer = [int(mylist[i][4]) for i in range(1,len(mylist))]
+total_units = [int(mylist[i][5]) for i in range(1,len(mylist))]
+print(moisturizer)
 # Profit
 total_profit = [mylist[i][6] for i in range(1,len(mylist))]
 
@@ -32,6 +32,12 @@ plt.xlabel('Month Number')
 plt.ylabel('Sales Units in number')
 plt.title('Sales data')
 plt.legend()
+# Set Y-axis limits to ensure all data is visible
+plt.ylim(bottom=0, top=max(face_cream + face_wash + tooth_paste + moisturizer) + 1000)  # Find max value, add buffer
+
+# Set custom Y-axis ticks
+specific_ticks = range(0, max(face_cream + face_wash + tooth_paste + moisturizer) + 1000, 1000)  # Ticks from 0 to max + 1000 with steps of 1000
+plt.yticks(specific_ticks)
 plt.tight_layout()
 plt.show()
 
