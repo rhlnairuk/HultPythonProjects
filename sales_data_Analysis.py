@@ -4,23 +4,15 @@ import matplotlib.pyplot as plt
 with open("salesdata.csv", "r") as my_file:
     mylist=list(csv.reader(my_file,delimiter=","))
 
-print(mylist)
-
-l1=[]
-for i in range(1,len(mylist)):
-    l1.append (int(mylist[i][1]))
-print(l1)
-print(mylist[1][0])
-
-month_number = [mylist[i][0] for i in range(1,len(mylist))]
+month_number = [int(mylist[i][0]) for i in range(1,len(mylist))]
 
 # Units Sold
-face_cream = [mylist[i][1] for i in range(1,len(mylist))]
-face_wash = [mylist[i][2] for i in range(1,len(mylist))]
-tooth_paste = [mylist[i][3] for i in range(1,len(mylist))]
-moisturizer = [mylist[i][4] for i in range(1,len(mylist))]
-total_units = [mylist[i][5] for i in range(1,len(mylist))]
-
+face_cream = [int(mylist[i][1]) for i in range(1,len(mylist))]
+face_wash = [int(mylist[i][2]) for i in range(1,len(mylist))]
+tooth_paste = [int(mylist[i][3]) for i in range(1,len(mylist))]
+moisturizer = [int(mylist[i][4]) for i in range(1,len(mylist))]
+total_units = [int(mylist[i][5]) for i in range(1,len(mylist))]
+print(moisturizer)
 # Profit
 total_profit = [mylist[i][6] for i in range(1,len(mylist))]
 
