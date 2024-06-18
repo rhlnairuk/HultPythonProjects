@@ -4,14 +4,6 @@ import matplotlib.pyplot as plt
 with open("salesdata.csv", "r") as my_file:
     mylist=list(csv.reader(my_file,delimiter=","))
 
-print(mylist)
-
-l1=[]
-for i in range(1,len(mylist)):
-    l1.append (int(mylist[i][1]))
-print(l1)
-print(mylist[1][0])
-
 month_number = [mylist[i][0] for i in range(1,len(mylist))]
 
 # Units Sold
