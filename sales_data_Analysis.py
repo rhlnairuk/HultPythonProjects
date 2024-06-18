@@ -13,7 +13,6 @@ def main():
 
     # Profit
     total_profit = [int(sales_data[i][8]) for i in range(1,len(sales_data))]
-    print(total_profit)
 
     # Task 1: Read the Total profit for all months and show it using a line plot
     plt.plot(month_number, total_profit, marker='o')
