@@ -41,14 +41,6 @@ plt.ylabel('Sales Units in number')
 plt.title('Sales data')
 plt.legend()
 plt.tight_layout()
-# Set Y-axis limits and ticks as multiples of 2000
-"""
-all_sales = [face_cream, face_wash, tooth_paste, moisturizer]  # Combine sales data for all categories
-max_value = max(sum(category) for category in all_sales)  # Find max sum across all categories
-top_limit = max_value // 2000 * 2000 + 2000  # Round up to nearest multiple of 2000, add buffer
-plt.ylim(bottom=0, top=top_limit)
-plt.yticks(range(0, top_limit, 2000))
-"""
 plt.show()
 
 
