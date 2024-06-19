@@ -12,6 +12,7 @@ class TransportFetchData:
     def __init__(self):
         self.all_arrivals = None
         self.baseurl = "https://api.tfl.gov.uk/StopPoint"
+        # Latitude and Longitude of HULT International Business School
         self.stop_point_lat = 51.52143248340143
         self.stop_point_lon = -0.1151982313809993
         self.radius = 500
@@ -30,10 +31,10 @@ class TransportFetchData:
             json.dump(all_arrivals, file, indent=4)
 
     def get_all_arrivals(self, file_path):
-        stop_points_dict = self.fetch_stop_points()
+        stop_points_data = self.fetch_stop_points()
         stop_point_dict = {}
         self.all_arrivals = {}
-        for stop in stop_points_dict['stopPoints']:
+        for stop in stop_points_data['stopPoints']:
             stop_point_dict[stop['id']] = {stop['stopType']: stop['commonName']}
         for id, cn in stop_point_dict.items():
             print(f"Stop: {list(cn.values())[0]}, StopID: {id}")
@@ -62,8 +63,8 @@ class TransportFetchData:
 class TransportDataLoader:
     def __init__(self):
         self.file_path = 'upcoming_arrivals_multiple_stops.json'
-     #   transport_fetcher = TransportFetchData()
-     #   transport_fetcher.get_all_arrivals(self.file_path)
+        transport_fetcher = TransportFetchData()
+        transport_fetcher.get_all_arrivals(self.file_path)
 
     def load_data(self):
         with open(self.file_path, 'r') as file:
@@ -73,8 +74,7 @@ class TransportDataLoader:
             for arrival in arrivals_list:
                 if arrival['Arrivals']:
                     records.append(arrival)
-        return  pd.DataFrame(records)
-        #return pd.DataFrame.from_dict(data, orient='index')
+        return pd.DataFrame(records)
 
 
 # Analyse the data
@@ -82,19 +82,19 @@ class TransportAnalyseData:
     def __init__(self):
         loader = TransportDataLoader()
         self.data = loader.load_data()
-        data_len = len(self.data)
-        #for i in range(0, data_len - 1):
-            #print(self.data)
-            #print(self.data[i]['stationName'])
-        arrivals_per_stop = self.data.groupby('stationName').size().sort_values(ascending=False)
-        arrivals_per_line = self.data.groupby('Line').size().sort_values(ascending=False)
-        # Plot arrivals per stop
+        mode_bus = self.data.query('Mode == "bus"')
+        mode_tube = self.data.query('Mode == "tube"')
+        arrivals_per_stop = mode_bus.groupby('stationName').size().sort_values(ascending=False)
+        arrivals_per_line = mode_bus.groupby('Line').size().sort_values(ascending=False)
+
+        # Plot arrivals per Bus stop
         plt.figure(figsize=(10, 6))
-        arrivals_per_stop.plot(kind='bar')
-        plt.title('Number of Arrivals per Stop')
+        arrivals_per_stop.plot(kind='barh')
+        plt.title('Number of Bus Arrivals per Stop')
         plt.xlabel('Stop Name')
         plt.ylabel('Number of Arrivals')
         plt.xticks(rotation=90)
+
         # Plot arrival times distribution
         plt.figure(figsize=(10, 6))
         time_to_station_minutes = self.data['timeToStation'] / 60
@@ -106,8 +106,8 @@ class TransportAnalyseData:
         # Plot popular lines
         plt.figure(figsize=(10, 6))
         arrivals_per_line.plot(kind='bar')
-        plt.title('Number of Arrivals per Line')
-        plt.xlabel('Line')
+        plt.title('Number of Arrivals per Bus Number')
+        plt.xlabel('Bus Number')
         plt.ylabel('Number of Arrivals')
 
 
@@ -119,16 +119,7 @@ class TransportAnalyseData:
 
         plt.tight_layout()
         plt.show()
-#        rows, cols = self.data.shape
-#        self.data_copy = self.data.copy()
-#        stations = [ self.data[0]['940GZZLUCHL']['stationName'] ]
-#        times = [ self.data[0]['940GZZLUCHL']['timeToStation'] ]
-#        self.time_sorted = sorted(zip(stations, times), key=lambda x: x[1])
-#        print(self.time_sorted)
-        #stations = self.data_copy['490007391E']['Arrivals'].explode()['stationName'].tolist()
-        #times = self.data_copy['490007391E']['Arrivals'].explode()['timeToStation'].tolist()
-        #self.time_sorted = sorted(zip(stations, times), key=lambda x: x[1])
-        #print(self.time_sorted)
+
 
 
 #Number of Arrivals per Stop
