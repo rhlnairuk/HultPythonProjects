@@ -37,12 +37,11 @@ class TransportFetchData:
         for stop in stop_points_data['stopPoints']:
             stop_point_dict[stop['id']] = {stop['stopType']: stop['commonName']}
         for id, cn in stop_point_dict.items():
-            print(f"Stop: {list(cn.values())[0]}, StopID: {id}")
+            #print(f"Stop: {list(cn.values())[0]}, StopID: {id}")
             arrivals = self.fetch_arrivals(id)
             if arrivals:
                 for arrival in arrivals:
-                    print(
-                        f"Mode: {arrival['modeName']},  Line: {arrival['lineId']}, Destination: {arrival['destinationName']}, StationName: {arrival['stationName']},  Time to Station: {round(arrival['timeToStation'] / 60, 2)} Minutes, PlatformName: {arrival['platformName']}")
+                    #print(f"Mode: {arrival['modeName']},  Line: {arrival['lineId']}, Destination: {arrival['destinationName']}, StationName: {arrival['stationName']},  Time to Station: {round(arrival['timeToStation'] / 60, 2)} Minutes, PlatformName: {arrival['platformName']}")
                     self.all_arrivals.setdefault(id, []).append({
                         "Arrivals": True,
                         "Mode": arrival['modeName'],
@@ -53,7 +52,7 @@ class TransportFetchData:
                         "platformName": arrival['platformName']
                     })
             else:
-                print("No arrivals")
+                #print("No arrivals")
                 self.all_arrivals[id] = [{"Arrivals": False}]
             time.sleep(10)
         self.save_arrival_data(self.all_arrivals, file_path)
@@ -63,8 +62,8 @@ class TransportFetchData:
 class TransportDataLoader:
     def __init__(self):
         self.file_path = 'upcoming_arrivals_multiple_stops.json'
-        #transport_fetcher = TransportFetchData()
-        #transport_fetcher.get_all_arrivals(self.file_path)
+        transport_fetcher = TransportFetchData()
+        transport_fetcher.get_all_arrivals(self.file_path)
 
     def load_data(self):
         with open(self.file_path, 'r') as file:
