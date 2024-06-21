@@ -89,6 +89,10 @@ class TransportAnalyseAndPrintData:
 
 
     def display_data(self):
+        loader = TransportDataLoader()
+        self.data = loader.load_data()
+        self.mode_bus = self.data.query('Mode == "bus"')
+        self.mode_tube = self.data.query('Mode == "tube"')
         for mode in ["bus", "tube"]:
             self.conditional_data = self.mode_bus if mode == "bus" else self.mode_tube
             self.station_names = self.conditional_data['stationName'].unique()
