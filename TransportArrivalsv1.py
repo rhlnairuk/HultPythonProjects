@@ -78,7 +78,7 @@ class TransportDataLoader:
 
 
 # Analyse the data
-class TransportAnalyseData:
+class TransportAnalyseAndPrintData:
     def __init__(self, mode):
         self.mode = mode
         loader = TransportDataLoader()
@@ -165,10 +165,13 @@ class TransportAnalyseData:
         plt.show()
 
 if __name__ == "__main__":
-    BusTransport = TransportAnalyseData("bus")
-    TubeTransport = TransportAnalyseData("tube")
+    BusTransport = TransportAnalyseAndPrintData("bus")
+    TubeTransport = TransportAnalyseAndPrintData("tube")
     BusTransport.create_plots()
     TubeTransport.create_plots()
-    BusTransport.display_data()
-    TubeTransport.display_data()
+    while True:
+        BusTransport.display_data()
+        TubeTransport.display_data()
+        time.sleep(5)
+
 
