@@ -34,10 +34,11 @@ class TransportFetchData:
         stop_points_data = self.fetch_stop_points()
         stop_point_dict = {}
         self.all_arrivals = {}
+        print("Fetching data for all stop points in 500 meter radius...")
         for stop in stop_points_data['stopPoints']:
             stop_point_dict[stop['id']] = {stop['stopType']: stop['commonName']}
         for id, cn in stop_point_dict.items():
-            #print(f"Stop: {list(cn.values())[0]}, StopID: {id}")
+            print(f"Fetching data for {list(cn.values())[0]}")
             arrivals = self.fetch_arrivals(id)
             if arrivals:
                 for arrival in arrivals:
@@ -54,7 +55,7 @@ class TransportFetchData:
             else:
                 #print("No arrivals")
                 self.all_arrivals[id] = [{"Arrivals": False}]
-            time.sleep(10)
+            time.sleep(5)
         self.save_arrival_data(self.all_arrivals, file_path)
 
 
@@ -100,9 +101,9 @@ class TransportAnalyseData:
             print('-' * 50)
             for _, row in station_data.iterrows():
                 if row['Mode'] == 'bus':
-                    print(f"Mode: {row['Mode']} Bus Number: {row['Line']} Destination: {row['Destination']} in {round(int(row['timeToStation']) / 60)} min")
+                    print(f"Mode: {row['Mode']} Bus Number: {row['Line']} Destination: {row['Destination']} on Platform: {row['platformName']} in {round(int(row['timeToStation']) / 60)} min")
                 elif row['Mode'] == 'tube':
-                    print(f"Mode: {row['Mode']} Line: {row['Line']} Destination: {row['Destination']} in {round(int(row['timeToStation']) / 60)} min")
+                    print(f"Mode: {row['Mode']} Line: {row['Line']} Destination: {row['Destination']} on {row['platformName']} in {round(int(row['timeToStation']) / 60)} min")
 
             print('-' * 50)
     def create_plots(self):
