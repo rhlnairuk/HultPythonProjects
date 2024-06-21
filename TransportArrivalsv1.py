@@ -63,8 +63,8 @@ class TransportFetchData:
 class TransportDataLoader:
     def __init__(self):
         self.file_path = 'upcoming_arrivals_multiple_stops.json'
-        #transport_fetcher = TransportFetchData()
-        #transport_fetcher.get_all_arrivals(self.file_path)
+        transport_fetcher = TransportFetchData()
+        transport_fetcher.get_all_arrivals(self.file_path)
 
     def load_data(self):
         with open(self.file_path, 'r') as file:
