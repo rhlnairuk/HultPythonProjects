@@ -63,8 +63,8 @@ class TransportFetchData:
 class TransportDataLoader:
     def __init__(self):
         self.file_path = 'upcoming_arrivals_multiple_stops.json'
-        transport_fetcher = TransportFetchData()
-        transport_fetcher.get_all_arrivals(self.file_path)
+        #transport_fetcher = TransportFetchData()
+        #transport_fetcher.get_all_arrivals(self.file_path)
 
     def load_data(self):
         with open(self.file_path, 'r') as file:
@@ -79,99 +79,107 @@ class TransportDataLoader:
 
 # Analyse the data
 class TransportAnalyseAndPrintData:
-    def __init__(self, mode):
-        self.mode = mode
+    def __init__(self):
         loader = TransportDataLoader()
         self.data = loader.load_data()
         self.mode_bus = self.data.query('Mode == "bus"')
         self.mode_tube = self.data.query('Mode == "tube"')
         self.destination_group = self.data.groupby('Destination').size().sort_values(ascending=False)
-        self.conditional_data = self.mode_bus if mode == "bus" else self.mode_tube
-        self.arrivals_per_stop = self.conditional_data.groupby('stationName').size().sort_values(ascending=False)
-        self.arrivals_per_line = self.conditional_data.groupby('Line').size().sort_values(ascending=False)
-        ten_min_time_to_station = self.conditional_data.query('timeToStation > 600')
-        self.arrivals_per_stop_ten_min_limit = ten_min_time_to_station.groupby('stationName').size().sort_values(ascending=False)
-        self.destination_group = self.conditional_data.groupby('Destination').size().sort_values(ascending=False)
-        self.station_names = self.conditional_data['stationName'].unique()
+
+
 
     def display_data(self):
-        for station in self.station_names:
-            station_data = self.data[self.data['stationName'] == station].sort_values(by='timeToStation')
-            print(f"{station}:")
-            print('-' * 50)
-            for _, row in station_data.iterrows():
-                if row['Mode'] == 'bus':
-                    print(f"Mode: {row['Mode']} Bus Number: {row['Line']} Destination: {row['Destination']} on Platform: {row['platformName']} in {round(int(row['timeToStation']) / 60)} min")
-                elif row['Mode'] == 'tube':
-                    print(f"Mode: {row['Mode']} Line: {row['Line']} Destination: {row['Destination']} on {row['platformName']} in {round(int(row['timeToStation']) / 60)} min")
+        for mode in ["bus", "tube"]:
+            self.conditional_data = self.mode_bus if mode == "bus" else self.mode_tube
+            self.station_names = self.conditional_data['stationName'].unique()
+            for station in self.station_names:
+                station_data = self.data[self.data['stationName'] == station].sort_values(by='timeToStation')
+                print(f"{station}:")
+                print('-' * 50)
+                for _, row in station_data.iterrows():
+                    if mode == 'bus':
+                        print(
+                            f"Mode: {mode} Bus Number: {mode} Destination: {row['Destination']} on Platform: {row['platformName']} in {round(int(row['timeToStation']) / 60)} min")
+                    elif row['Mode'] == 'tube':
+                        print(
+                            f"Mode: {mode} Line: {row['Line']} Destination: {row['Destination']} on {row['platformName']} in {round(int(row['timeToStation']) / 60)} min")
+                print('-' * 50)
 
-            print('-' * 50)
     def create_plots(self):
-        # Plot: Number of Arrivals per Station in 10 Minutes
-        plt.figure(figsize=(12, 8))
-        self.arrivals_per_stop_ten_min_limit.plot(kind='barh')
-        plt.title(f'Number of Arrivals per {self.mode} Station in 10 Minutes')
-        plt.xlabel('Number of Arrivals')
-        plt.ylabel('Station Name')
-        plt.tight_layout(pad=3.0)
-        plt.show()
+        for mode in ["bus", "tube"]:
+            self.conditional_data = self.mode_bus if mode == "bus" else self.mode_tube
+            self.station_names = self.conditional_data['stationName'].unique()
+            self.conditional_data = self.mode_bus if mode == "bus" else self.mode_tube
+            self.arrivals_per_stop = self.conditional_data.groupby('stationName').size().sort_values(ascending=False)
+            self.arrivals_per_line = self.conditional_data.groupby('Line').size().sort_values(ascending=False)
+            ten_min_time_to_station = self.conditional_data.query('timeToStation > 600')
+            self.arrivals_per_stop_ten_min_limit = ten_min_time_to_station.groupby('stationName').size().sort_values(
+                ascending=False)
+            self.destination_group = self.conditional_data.groupby('Destination').size().sort_values(ascending=False)
+            # Plot: Number of Arrivals per Station in 10 Minutes
+            plt.figure(figsize=(12, 8))
+            self.arrivals_per_stop_ten_min_limit.plot(kind='barh')
+            plt.title(f'Number of Arrivals per {mode} Station in 10 Minutes')
+            plt.xlabel('Number of Arrivals')
+            plt.ylabel('Station Name')
+            plt.tight_layout(pad=3.0)
+            plt.show()
 
-        # Plot arrivals per stop
-        plt.figure(figsize=(10, 6))
-        self.arrivals_per_stop.plot(kind='barh')
-        plt.title(f"Total Number of {self.mode} Arrivals per Stop")
-        plt.ylabel('Stop Name')
-        plt.xlabel('Number of Arrivals')
-        plt.xticks(rotation=90)
-        plt.tight_layout(pad=3.0)
-        plt.show()
-        # Plot arrivals for destinations per stop
-        plt.figure(figsize=(10, 6))
-        self.destination_group.plot(kind='barh')
-        plt.title(f"Number of {self.mode} Arrivals by Destinations")
-        plt.ylabel('Stop Name')
-        plt.xlabel('Number of Arrivals')
-        plt.xticks(rotation=90)
-        plt.tight_layout(pad=3.0)
-        plt.show()
+            # Plot arrivals per stop
+            plt.figure(figsize=(10, 6))
+            self.arrivals_per_stop.plot(kind='barh')
+            plt.title(f"Total Number of {mode} Arrivals per Stop")
+            plt.ylabel('Stop Name')
+            plt.xlabel('Number of Arrivals')
+            plt.xticks(rotation=90)
+            plt.tight_layout(pad=3.0)
+            plt.show()
+            # Plot arrivals for destinations per stop
+            plt.figure(figsize=(10, 6))
+            self.destination_group.plot(kind='barh')
+            plt.title(f"Number of {mode} Arrivals by Destinations")
+            plt.ylabel('Stop Name')
+            plt.xlabel('Number of Arrivals')
+            plt.xticks(rotation=90)
+            plt.tight_layout(pad=3.0)
+            plt.show()
 
-        # Prepare data for plotting
-        data_to_plot = [self.conditional_data[self.conditional_data['stationName'] == station]['timeToStation'].values / 60 for station in self.station_names]
+            # Prepare data for plotting
+            data_to_plot = [
+                self.conditional_data[self.conditional_data['stationName'] == station]['timeToStation'].values / 60 for
+                station in self.station_names]
 
-        # Box Plot: Time to Station per Bus/Tube at each Station
-        plt.figure(figsize=(14, 8))
-        plt.boxplot(data_to_plot, tick_labels=self.station_names,showmeans=True,
-            meanline=True,
-            medianprops=dict(color='blue', linewidth=2),
-            meanprops=dict(color='red', linewidth=2))
-        plt.title(f'Time to Station per {self.mode} at each Station/Stop')
-        plt.xlabel('Station Name')
-        plt.ylabel('Time to Station (minutes)')
-        plt.xticks(rotation=45, ha='right')
-        plt.tight_layout()
-        plt.grid(True)
-        plt.show()
+            # Box Plot: Time to Station per Bus/Tube at each Station
+            plt.figure(figsize=(14, 8))
+            plt.boxplot(data_to_plot, tick_labels=self.station_names, showmeans=True,
+                        meanline=True,
+                        medianprops=dict(color='blue', linewidth=2),
+                        meanprops=dict(color='red', linewidth=2))
+            plt.title(f'Time to Station per {mode} at each Station/Stop')
+            plt.xlabel('Station Name')
+            plt.ylabel('Time to Station (minutes)')
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            plt.grid(True)
+            plt.show()
 
-        for station in self.station_names:
-            station_data = self.conditional_data[self.conditional_data['stationName'] == station]
-            plt.scatter([station] * len(station_data), (station_data['timeToStation'] / 60), alpha=0.6)
+            for station in self.station_names:
+                station_data = self.conditional_data[self.conditional_data['stationName'] == station]
+                plt.scatter([station] * len(station_data), (station_data['timeToStation'] / 60), alpha=0.6)
 
-        plt.title(f'Time to Station per {self.mode} at each Station')
-        plt.xlabel('Station Name')
-        plt.ylabel('Time to Station (minutes)')
-        plt.xticks(rotation=45, ha='right')
-        plt.grid(True)
-        plt.tight_layout()
-        plt.show()
+            plt.title(f'Time to Station per {mode} at each Station')
+            plt.xlabel('Station Name')
+            plt.ylabel('Time to Station (minutes)')
+            plt.xticks(rotation=45, ha='right')
+            plt.grid(True)
+            plt.tight_layout()
+            plt.show()
+
 
 if __name__ == "__main__":
-    BusTransport = TransportAnalyseAndPrintData("bus")
-    TubeTransport = TransportAnalyseAndPrintData("tube")
-    BusTransport.create_plots()
-    TubeTransport.create_plots()
+    Transport = TransportAnalyseAndPrintData()
+    Transport.create_plots()
     while True:
-        BusTransport.display_data()
-        TubeTransport.display_data()
+        Transport.display_data()
         time.sleep(5)
-
 
